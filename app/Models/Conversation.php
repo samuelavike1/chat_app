@@ -16,6 +16,27 @@ class Conversation extends Model
         'last_message_id',
     ];
 
+    public static function updateConversationWithMessage($userId1, $userId2, $message)
+    {
+        $conversation = Conversation::query()->where(function ($query) use ($userId1, $userId2) {
+            $query->where('user_id1', $userId1)
+                ->where('user_id2', $userId2);
+        })->orWhere(function ($query) use ($userId1, $userId2) {
+            $query->where('user_id1', $userId2)
+                ->where('user_id2', $userId1);
+        })->first();
+
+        if ($conversation) {
+            $conversation->update(['last_message_id' => $message->id]);
+        } else {
+            $conversation = Conversation::query()->create([
+                'user_id1' => $userId1,
+                'user_id2' => $userId2,
+                'last_message_id' => $message->id,
+            ]);
+        }
+    }
+
     public function last_messages():BelongsTo
     {
         return $this->belongsTo(Message::class, 'last_message_id');
