@@ -58,11 +58,13 @@ class MessageController extends Controller
                     $query->where('sender_id', $message->sender_id)
                         ->where('receiver_id', $message->receiver_id)
                         ->orWhere('sender_id', $message->receiver_id)
-                        ->where('reciever_id', $message->sender_id);
+                        ->where('receiver_id', $message->sender_id);
                 })
                 ->latest()
                 ->paginate(10);
         }
+
+        return MessageResource::collection($messages);
     }
 
     public function store(StoreMessageRequest $request)
@@ -72,6 +74,7 @@ class MessageController extends Controller
         $receiverId = $data['receiver_id'] ?? null;
         $groupId = $data['group_id'] ?? null;
         $files = $data['attachments'] ?? [];
+
 
         $message = Message::query()->create($data);
 

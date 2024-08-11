@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {PencilSquareIcon} from "@heroicons/react/24/outline/index.js";
 import TextInput from "@/Components/TextInput.jsx";
 import ConversationItem from "@/Components/App/ConversationItem.jsx";
+import {useEventBus} from "@/EventBus.jsx";
 
 
 const ChatLayout = ({ children }) => {
@@ -11,6 +12,7 @@ const ChatLayout = ({ children }) => {
     const selectedConversation = page.props.selectedConversation;
     const [localConversations, setLocalConversations] = useState([]);
     const [sortedConversations, setSortedConversations] = useState([]);
+    const { on } = useEventBus();
 
     const [onlineUsers, setOnlineUsers] = useState({});
     const isUserOnline = (userId) => onlineUsers[userId];
@@ -87,18 +89,50 @@ const ChatLayout = ({ children }) => {
         }
     },[])
 
-    console.log('online',onlineUsers)
+    const messageCreated = (message) => {
+        setLocalConversations((oldUsers)=>{
+            return oldUsers.map((u)=>{
+                if (message.receiver_id && !u.is_group &&
+                    (u.id == message.sender_id || u.id == message.receiver_id)
+                ){
+                    u.last_message = message.message;
+                    u.last_message_date = message.created_at;
+                    return u;
+                }
 
-    console.log('local',localConversations)
-    console.log('sortedConversations',sortedConversations);
+                if (
+                    message.group_id &&
+                    u.is_group &&
+                    u.id == message.group_id
+                ){
+                    u.last_message = message.message;
+                    u.last_message_date = message.created_at;
+                    return u;
+                }
+                return u;
+            })
+        })
+    }
+
+    useEffect(()=>{
+        const offCreated = on("message.created", messageCreated);
+        return()=>{
+            offCreated()
+        }
+    }, [on]);
+
+    // console.log('online',onlineUsers)
+
+    // console.log('local',localConversations)
+    // console.log('sortedConversations',sortedConversations);
     return (
         <>
             <div className='flex-1 w-full flex overflow-hidden'>
                 <div
                     className= {`transition-all w-full sm:w-[220px] md:w-[300px] bg-slate-800 flex flex-col overflow-hidden
-                    ${selectedConversation ? "-ml-[100% sm:ml-0 ]" : ""}`}
+                    ${selectedConversation ? "-ml-[100%] sm:ml-0 " : ""}`}
                 >
-                    <div className='flex items-center justify-between py-2 px-3 text-xl font-medium text-gray-900 dark:text-gray-100'>
+                    <div className='flex items-center justify-between py-2 px-3 text-xl font-medium '>
                         My Conversations
                         <div
                         className='tooltip tooltip-left'

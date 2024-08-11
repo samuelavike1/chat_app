@@ -32,10 +32,10 @@ class Group extends Model
 
     public static function updateGroupWithMessage($groupId, $message)
     {
-        return self::query()->updateOrCreate([
-            'id' => $groupId,
-            'last_message_id' => $message->id,
-        ]);
+        return self::query()->updateOrCreate(
+            ['id' => $groupId],
+            ['last_message_id' => $message->id],
+        );
     }
 
     public function users()
@@ -67,7 +67,7 @@ class Group extends Model
             'created_at'=>$this->created_at,
             'updated_at'=>$this->updated_at,
             'last_message'=>$this->last_message,
-            'last_message_date'=>$this->last_message_date,
+            'last_message_date'=>$this->last_message_date ? $this->last_message_date.' UTC' : null,
         ];
     }
 
