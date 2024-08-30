@@ -13,7 +13,7 @@ class MessageAttachment extends Model
         'message_id',
         'name',
         'path',
-        'mine',
+        'mime',
         'size',
     ];
 }

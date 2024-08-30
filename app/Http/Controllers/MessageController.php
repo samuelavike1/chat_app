@@ -10,6 +10,7 @@ use App\Models\Group;
 use App\Models\Message;
 use App\Models\MessageAttachment;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -90,11 +91,10 @@ class MessageController extends Controller
                     'name' => $file->getClientOriginalName(),
                     'mime' => $file->getClientMimeType(),
                     'size' => $file->getSize(),
-                    'path' => $file->storeAs($directory, 'public'),
+                    'path' => $file->store($directory, 'public'),
                 ];
 
-                $attachments = MessageAttachment::query()->create($model);
-                $attachments[] = $attachments;
+                $attachments[] = MessageAttachment::query()->create($model);
             }
             $message->attachments = $attachments;
         }
@@ -118,7 +118,12 @@ class MessageController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
+        Log::info('Deleting message', ['message' => $message]);
+
         $message->delete();
+
+        // Debugging
+        Log::info('Message deleted', ['message_id' => $message->id]);
 
         return response()->json('', 204);
     }

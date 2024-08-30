@@ -8,6 +8,7 @@ import MessageItem from "@/Components/App/MessageItem.jsx";
 import MessageInput from "@/Components/App/MessageInput.jsx";
 import {useEventBus} from "@/EventBus.jsx";
 import axios from "axios";
+import AttachmentPreviewModal from "@/Components/App/AttachmentPreviewModal.jsx";
 
 function Home({ selectedConversation, messages }) {
     // console.log('messages',messages);
@@ -16,6 +17,8 @@ function Home({ selectedConversation, messages }) {
     const [noMoreMessages, setNoMoreMessages] = useState(false);
     const [scrollFromBottom, setScrollFromBottom] = useState(0);
     const  loadMoreIntersect =useRef(null)
+    const [showAttachmentPreview, setShowAttachmentPreview] = useState(false);
+    const [previewAttachment, setPreviewAttachment] = useState({});
     const messagesCtrRef = useRef(null);
     const { on } = useEventBus();
 
@@ -47,6 +50,7 @@ function Home({ selectedConversation, messages }) {
             })
     }, [localMessages, noMoreMessages])
 
+
     const messageCreated = (message) => {
         if (selectedConversation && selectedConversation.is_group && selectedConversation.id == message.group_id) {
             setLocalMessages((prevMessages) => [...prevMessages, message]);
@@ -60,6 +64,46 @@ function Home({ selectedConversation, messages }) {
         }
     }
 
+    const messageDeleted = (message) => {
+        console.log("Received message.deleted event for message:", message);
+
+        if (selectedConversation) {
+            console.log("Selected Conversation:", selectedConversation);
+
+            if (selectedConversation.is_group && selectedConversation.id == message.group_id) {
+                console.log("Deleting from group messages");
+                setLocalMessages((prevMessages) => {
+                    const updatedMessages = prevMessages.filter((m) => m.id !== message.id);
+                    console.log("Updated messages for group:", updatedMessages);
+                    return updatedMessages;
+                });
+            }
+
+            if (selectedConversation.is_user &&
+                (selectedConversation.id == message.sender_id || selectedConversation.id == message.receiver_id)) {
+                console.log("Deleting from user messages");
+                setLocalMessages((prevMessages) => {
+                    const updatedMessages = prevMessages.filter((m) => m.id !== message.id);
+                    console.log("Updated messages for user:", updatedMessages);
+                    return updatedMessages;
+                });
+            }
+        } else {
+            console.log("No selectedConversation found");
+        }
+    };
+
+
+
+    const onAttachmentClick = (attachments, ind) => {
+        console.log('attachmentsclick', attachments);
+        setPreviewAttachment({
+            attachments,
+            ind,
+        })
+        setShowAttachmentPreview(true);
+    }
+
     useEffect(() => {
         setTimeout(() => {
             if (messagesCtrRef.current) {
@@ -67,12 +111,14 @@ function Home({ selectedConversation, messages }) {
             }
         }, 10)
         const offCreated = on('message.created', messageCreated)
+        const offDeleted = on('message.deleted', messageDeleted)
 
         setScrollFromBottom(0);
         setNoMoreMessages(false);
 
         return () => {
             offCreated();
+            offDeleted();
         }
     },[selectedConversation]);
 
@@ -137,13 +183,22 @@ function Home({ selectedConversation, messages }) {
                             <div className='flex-1 flex flex-col'>
                                 <div ref={loadMoreIntersect}></div>
                                 {localMessages.map((message) => (
-                                    <MessageItem key={message.id} message={message}/>
+                                    <MessageItem key={message.id} message={message} />
+                                    // <MessageItem key={message.id} message={message} attachmentClick={onAttachmentClick} />
                                 ))}
                             </div>
                         )}
                     </div>
                     <MessageInput conversation={selectedConversation} />
                 </>
+            )}
+            {previewAttachment.attachments && (
+                <AttachmentPreviewModal
+                    attachments={previewAttachment.attachments}
+                    index={previewAttachment.ind}
+                    show={showAttachmentPreview}
+                    onClose={() => setShowAttachmentPreview(false)}
+                />
             )}
         </>
     );
