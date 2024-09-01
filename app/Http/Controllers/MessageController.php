@@ -120,11 +120,32 @@ class MessageController extends Controller
 
         Log::info('Deleting message', ['message' => $message]);
 
+
+        $group = null;
+        $conversation = null;
+        if ($message->group_id){
+            $group = Group::query()->where('last_message_id', $message->id)->first();
+        } else {
+            $conversation = Conversation::query()->where('last_message_id', $message->id)->first();
+        }
+
         $message->delete();
 
         // Debugging
         Log::info('Message deleted', ['message_id' => $message->id]);
 
-        return response()->json('', 204);
+        if ($group){
+            $group = Group::query()->find($group->id);
+            $last_message = $group->lastMessage;
+        } elseif ($conversation){
+            $conversation = Conversation::query()->find($conversation->id);
+            $last_message = $conversation->lastMessage;
+        }
+//        dd($conversation);
+
+
+
+//        return response()->json(['message' => $last_message ? new MessageResource($last_message) : null]);
+        return response()->json(['message' => 'message deleted']);
     }
 }

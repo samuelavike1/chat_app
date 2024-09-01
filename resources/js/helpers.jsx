@@ -67,6 +67,7 @@ export const isAudio = (attachment) => {
     return mime[0].toLowerCase() === "audio";
 }
 export const isPDF = (attachment) => {
+    if (!attachment || !attachment.mime && !attachment.type) return false; // Check if attachment is valid
     let mime = attachment.mime || attachment.type;
     return mime === "application/pdf";
 }

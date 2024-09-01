@@ -26,7 +26,7 @@ class MessageObserver
                     ->where('id', '!=', $message->id)
                     ->latest()
                     ->limit(1)
-                    ->first();
+                    ->first(); 
 
                 if ($prevMessage){
                     $group->last_message_id = $prevMessage->id;

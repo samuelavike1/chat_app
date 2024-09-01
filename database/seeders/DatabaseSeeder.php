@@ -31,6 +31,33 @@ class DatabaseSeeder extends Seeder
             'email' => 'samuelavike@email.com',
             'password'=>'password',
         ]);
+        User::factory()->create([
+            'name' => 'Mark Quaicoe',
+            'email' => 'markbible2020@gmail.com',
+            'password'=>'MarkGrimm',
+            'is_admin'=> true
+        ]);
+        User::factory()->create([
+            'name' => 'Samuel Boakye',
+            'email' => 'boakyesamuel950@gmail.com',
+            'password'=>'nanabee950',
+            'is_admin'=> true
+        ]);
+        User::factory()->create([
+            'name' => 'Agnes',
+            'email' => 'agnes@gmail.com',
+            'password'=>'password',
+        ]);
+        User::factory()->create([
+            'name' => 'Francis',
+            'email' => 'francis@gmail.com',
+            'password'=>'password',
+        ]);
+        User::factory()->create([
+            'name' => 'peter',
+            'email' => 'peter@gmail.com',
+            'password'=>'password',
+        ]);
 
         User::factory(10)->create();
 
@@ -43,7 +70,7 @@ class DatabaseSeeder extends Seeder
             $group->users()->attach(array_unique([1, ...$users]));
         }
 
-        Message::factory(1000)->create();
+        Message::factory(100)->create();
         $messages = Message::query()->whereNull('group_id')->orderBy('created_at')->get();
         $conversations = $messages->groupBy(function ($message){
             return collect([$message->sender_id, $message->receiver_id])->sort()->implode('_');

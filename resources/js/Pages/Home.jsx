@@ -64,7 +64,7 @@ function Home({ selectedConversation, messages }) {
         }
     }
 
-    const messageDeleted = (message) => {
+    const messageDeleted = ({message}) => {
         console.log("Received message.deleted event for message:", message);
 
         if (selectedConversation) {
@@ -110,6 +110,7 @@ function Home({ selectedConversation, messages }) {
                 messagesCtrRef.current.scrollTop = messagesCtrRef.current.scrollHeight;
             }
         }, 10)
+
         const offCreated = on('message.created', messageCreated)
         const offDeleted = on('message.deleted', messageDeleted)
 
@@ -127,6 +128,7 @@ function Home({ selectedConversation, messages }) {
     }, [messages])
 
     useEffect(()=>{
+        console.log('localMessages: ', localMessages);
         if (messagesCtrRef.current && scrollFromBottom !== null) {
             messagesCtrRef.current.scrollTop =
                 messagesCtrRef.current.scrollHeight -
