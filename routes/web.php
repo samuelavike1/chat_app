@@ -14,6 +14,10 @@ Route::middleware(['auth', 'verified'])->group( function () {
     Route::delete('/message/{message}',[\App\Http\Controllers\MessageController::class, 'destroy'])->name('message.destroy');
     Route::get('/message/older/{message}',[\App\Http\Controllers\MessageController::class, 'loadOlder'])->name('message.loadOlder');
 
+
+    Route::post('/group', [\App\Http\Controllers\GroupController::class, 'store'])->name('group.store');
+    Route::put('/group/{group}', [\App\Http\Controllers\GroupController::class, 'update'])->name('group.update');
+    Route::delete('/group/{group}', [\App\Http\Controllers\GroupController::class, 'destroy'])->name('group.destroy');
 });
 
 
