@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Crypt;
 
 class MessageResource extends JsonResource
 {
@@ -17,7 +18,7 @@ class MessageResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'message'=>$this->message,
+            'message'=> Crypt::decryptString($this->message),
             'sender_id'=>$this->sender_id,
             'receiver_id'=>$this->receiver_id,
             'sender'=> new UserResource($this->sender),

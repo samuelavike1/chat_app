@@ -1,0 +1,4 @@
+1. php artisan serve
+2. php artisan reverb:start --debug
+3. php artisan queue:listen
+4.npm run dev

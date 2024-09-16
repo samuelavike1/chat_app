@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Crypt;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Message>
@@ -36,7 +37,7 @@ class MessageFactory extends Factory
         }
 
         return [
-            'message' => $this->faker->realText(100),
+            'message' => Crypt::encryptString($this->faker->paragraph()),
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
             'group_id' => $groupId,
